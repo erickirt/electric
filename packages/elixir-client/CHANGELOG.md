@@ -1,5 +1,15 @@
 # @core/elixir-client
 
+## 0.6.0
+
+### Minor Changes
+
+- 000f96d: Enabling correct handling and dumping of custom types in fields
+
+### Patch Changes
+
+- 0928065: Allow for using a custom Finch pool in the Elixir client
+
 ## 0.5.0
 
 ### Minor Changes
