@@ -1,5 +1,17 @@
 # @core/sync-service
 
+## 1.0.18
+
+### Patch Changes
+
+- 0928065: Make `PublicationManager` calls idempotent based on shape handles to ensure proper cleanups.
+- ca329d3: Open a replication connection to acquire the exclusive connection lock, fixing the lock semantics for cases where Electric runs with a pooled connection string.
+- 3ef7ed3: Consistently send `:ready` stack event after replication client restarts as well.
+- b862abc: Fix compilation issue that appeared in Erlang/OTP 28.0.
+- fbeb583: Fix shape hash lookup deletion upon removing shape
+- 6bc8924: Fix for possible collisions when generating the next interval timestamp for long polling.
+- 0928065: Fix race conditions with shape deletion
+
 ## 1.0.17
 
 ### Patch Changes
