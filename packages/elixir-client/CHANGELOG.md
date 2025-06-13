@@ -1,5 +1,28 @@
 # @core/elixir-client
 
+## 0.6.2
+
+### Patch Changes
+
+- 3f43346: Support generating shape definitions from Ecto.Changeset structs, add replica mode to client ShapeDefinitions, ensure client parameters are always of type %{binary() => binary()} and expose some options schema information for use in Phoenix.Sync
+
+## 0.6.1
+
+### Patch Changes
+
+- 67b8172: Add support for array parameters in ecto where clauses
+
+## 0.6.0
+
+### Minor Changes
+
+- 000f96d: Enabling correct handling and dumping of custom types in fields
+
+### Patch Changes
+
+- 0928065: Allow for using a custom Finch pool in the Elixir client
+- b327626: Fix consumption of embedded API across processes
+
 ## 0.5.0
 
 ### Minor Changes

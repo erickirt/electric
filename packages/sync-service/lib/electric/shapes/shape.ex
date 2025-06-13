@@ -2,12 +2,24 @@ defmodule Electric.Shapes.Shape do
   @moduledoc """
   Struct describing the requested shape
   """
-  require Logger
   alias Electric.Replication.Eval.Expr
   alias Electric.Postgres.Inspector
   alias Electric.Replication.Eval.Parser
   alias Electric.Replication.Changes
   alias Electric.Shapes.WhereClause
+
+  require Logger
+
+  defprotocol Comparable do
+    @fallback_to_any true
+
+    @spec comparable(t()) :: t()
+    def comparable(term)
+  end
+
+  defimpl Comparable, for: Any do
+    def comparable(term), do: term
+  end
 
   @default_replica :default
 
@@ -61,8 +73,22 @@ defmodule Electric.Shapes.Shape do
           storage: %{required(String.t()) => String.t()}
         }
 
-  def comparable(%__MODULE__{} = shape),
-    do: shape |> Map.drop([:table_info, :storage])
+  @doc """
+  Return a comparable representation of the shape.
+
+  This is used to compare shapes for equality as an ETS key - and thus it'll be matched in some cases,
+  not just compared equal. This representation must therefore not contain any maps (as they are matched when one
+  is missing a key for example).
+
+  This representation must contain all the information that identifies user-specified properties of the shape. We're
+  omitting storage configuration and other internal state.
+  """
+  def comparable(%__MODULE__{} = shape) do
+    {:shape, {shape.root_table_id, shape.root_table}, shape.root_pk,
+     Comparable.comparable(shape.where), shape.selected_columns,
+     Enum.flat_map(shape.flags, fn {k, v} -> if(v, do: [k], else: []) end) |> Enum.sort(),
+     shape.replica}
+  end
 
   def hash(%__MODULE__{} = shape),
     do: shape |> comparable() |> :erlang.phash2()

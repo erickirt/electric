@@ -47,7 +47,9 @@ if Code.ensure_loaded?(Electric.Shapes.Api) do
         schema: Api.schema(response),
         next_cursor: nil,
         request_timestamp: timestamp,
-        body: response.body
+        # Ensure we enumerate the response body in the same process that made the
+        # original api request so the cleanup shape process cleanup works
+        body: Enum.into(response.body, [])
       }
     end
 
@@ -55,10 +57,10 @@ if Code.ensure_loaded?(Electric.Shapes.Api) do
       Map.merge(
         request.params,
         %{
-          offset: to_string(request.offset),
-          handle: request.shape_handle,
-          live: request.live,
-          replica: request.replica
+          "offset" => to_string(request.offset),
+          "handle" => request.shape_handle,
+          "live" => request.live,
+          "replica" => request.replica
         }
       )
     end
