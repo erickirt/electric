@@ -8,7 +8,7 @@ defmodule Electric.Replication.ShapeLogCollector.FlushTracker do
     :last_global_flushed_offset,
     :last_seen_offset,
     :last_flushed,
-    :min_incomlete_flush_tree,
+    :min_incomplete_flush_tree,
     :notify_fn
   ]
 
@@ -18,7 +18,7 @@ defmodule Electric.Replication.ShapeLogCollector.FlushTracker do
           last_flushed: %{
             optional(shape_id()) => {last_sent :: LogOffset.t(), last_flushed :: LogOffset.t()}
           },
-          min_incomlete_flush_tree: :gb_trees.tree(LogOffset.t_tuple(), MapSet.t(shape_id())),
+          min_incomplete_flush_tree: :gb_trees.tree(LogOffset.t_tuple(), MapSet.t(shape_id())),
           notify_fn: (non_neg_integer() -> any())
         }
 
@@ -82,9 +82,13 @@ defmodule Electric.Replication.ShapeLogCollector.FlushTracker do
       last_global_flushed_offset: LogOffset.before_all(),
       last_seen_offset: LogOffset.before_all(),
       last_flushed: %{},
-      min_incomlete_flush_tree: :gb_trees.empty(),
+      min_incomplete_flush_tree: :gb_trees.empty(),
       notify_fn: opts[:notify_fn]
     }
+  end
+
+  def empty?(%__MODULE__{last_flushed: last_flushed, min_incomplete_flush_tree: tree}) do
+    last_flushed == %{} and :gb_trees.size(tree) == 0
   end
 
   @spec handle_transaction(t(), Transaction.t(), Enumerable.t(shape_id())) :: t()
@@ -127,21 +131,21 @@ defmodule Electric.Replication.ShapeLogCollector.FlushTracker do
   def handle_flush_notification(
         %__MODULE__{
           last_flushed: last_flushed,
-          min_incomlete_flush_tree: min_incomlete_flush_tree
+          min_incomplete_flush_tree: min_incomplete_flush_tree
         } = state,
         shape_id,
         last_flushed_offset
       )
       when is_map_key(last_flushed, shape_id) do
-    {last_flushed, min_incomlete_flush_tree} =
+    {last_flushed, min_incomplete_flush_tree} =
       case Map.fetch!(last_flushed, shape_id) do
         {^last_flushed_offset, prev_flushed_offset} ->
           {Map.delete(last_flushed, shape_id),
-           delete_from_tree(min_incomlete_flush_tree, prev_flushed_offset, shape_id)}
+           delete_from_tree(min_incomplete_flush_tree, prev_flushed_offset, shape_id)}
 
         {last_sent, prev_flushed_offset} ->
           {Map.put(last_flushed, shape_id, {last_sent, last_flushed_offset}),
-           min_incomlete_flush_tree
+           min_incomplete_flush_tree
            |> delete_from_tree(prev_flushed_offset, shape_id)
            |> add_to_tree(last_flushed_offset, shape_id)}
       end
@@ -149,7 +153,7 @@ defmodule Electric.Replication.ShapeLogCollector.FlushTracker do
     %__MODULE__{
       state
       | last_flushed: last_flushed,
-        min_incomlete_flush_tree: min_incomlete_flush_tree
+        min_incomplete_flush_tree: min_incomplete_flush_tree
     }
     |> update_global_offset()
   end
@@ -165,8 +169,8 @@ defmodule Electric.Replication.ShapeLogCollector.FlushTracker do
         %__MODULE__{
           state
           | last_flushed: Map.delete(last_flushed, shape_id),
-            min_incomlete_flush_tree:
-              delete_from_tree(state.min_incomlete_flush_tree, last_flushed_offset, shape_id)
+            min_incomplete_flush_tree:
+              delete_from_tree(state.min_incomplete_flush_tree, last_flushed_offset, shape_id)
         }
         |> update_global_offset()
 
@@ -185,11 +189,11 @@ defmodule Electric.Replication.ShapeLogCollector.FlushTracker do
 
   defp update_global_offset(
          %__MODULE__{
-           min_incomlete_flush_tree: min_incomlete_flush_tree,
+           min_incomplete_flush_tree: min_incomplete_flush_tree,
            last_global_flushed_offset: prev_last_global_flushed_offset
          } = state
        ) do
-    {offset, _} = :gb_trees.smallest(min_incomlete_flush_tree)
+    {offset, _} = :gb_trees.smallest(min_incomplete_flush_tree)
 
     last_global_flushed_offset =
       LogOffset.max(prev_last_global_flushed_offset, LogOffset.new(offset))
@@ -219,7 +223,7 @@ defmodule Electric.Replication.ShapeLogCollector.FlushTracker do
 
     new_mapset = MapSet.delete(:gb_trees.get(offset_tuple, tree), shape_id)
 
-    if MapSet.equal?(new_mapset, MapSet.new()) do
+    if MapSet.size(new_mapset) == 0 do
       :gb_trees.delete(offset_tuple, tree)
     else
       :gb_trees.update(offset_tuple, new_mapset, tree)
@@ -238,21 +242,25 @@ defmodule Electric.Replication.ShapeLogCollector.FlushTracker do
     end
   end
 
-  defp tree_get_shape_set(%__MODULE__{min_incomlete_flush_tree: tree}, offset) do
+  defp tree_get_shape_set(%__MODULE__{min_incomplete_flush_tree: tree}, offset) do
     case :gb_trees.lookup(LogOffset.to_tuple(offset), tree) do
       :none -> MapSet.new()
       {:value, mapset} -> mapset
     end
   end
 
+  @empty_mapset MapSet.new()
   defp tree_enter_shape_set(
-         %__MODULE__{min_incomlete_flush_tree: tree} = state,
+         %__MODULE__{min_incomplete_flush_tree: tree} = state,
          offset,
          %MapSet{} = mapset
-       ) do
+       )
+       when mapset != @empty_mapset do
     %__MODULE__{
       state
-      | min_incomlete_flush_tree: :gb_trees.enter(LogOffset.to_tuple(offset), mapset, tree)
+      | min_incomplete_flush_tree: :gb_trees.enter(LogOffset.to_tuple(offset), mapset, tree)
     }
   end
+
+  defp tree_enter_shape_set(state, _, _), do: state
 end

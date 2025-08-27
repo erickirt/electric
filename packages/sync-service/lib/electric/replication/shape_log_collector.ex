@@ -133,7 +133,7 @@ defmodule Electric.Replication.ShapeLogCollector do
       {:noreply,
        state
        |> remove_subscription({pid, ref}, shape_handle)
-       |> Map.update!(:flush_tracker, &FlushTracker.handle_shape_removed(&1, pid))}
+       |> Map.update!(:flush_tracker, &FlushTracker.handle_shape_removed(&1, shape_handle))}
     end)
   end
 
@@ -226,7 +226,7 @@ defmodule Electric.Replication.ShapeLogCollector do
     end)
 
     OpenTelemetry.add_span_attributes("txn.is_dropped": true)
-    state
+    %{state | flush_tracker: FlushTracker.handle_transaction(state.flush_tracker, txn, [])}
   end
 
   defp handle_transaction(state, txn) do
