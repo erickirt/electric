@@ -1,5 +1,12 @@
 # @core/sync-service
 
+## 1.1.11
+
+### Patch Changes
+
+- c978ee6: Split pg connections across two pools so that high demand for snapshots doesn't interfere with the ability to introspect tables, configure the publication or monitor the WAL size
+- c978ee6: Move connection opts resolution out of connection manager into a separate synchronous function call
+
 ## 1.1.10
 
 ### Patch Changes
