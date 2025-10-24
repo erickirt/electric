@@ -1,5 +1,41 @@
 # @core/sync-service
 
+## 1.2.0
+
+### Minor Changes
+
+- e63c398: Remove old FileStorage implementation
+- 37242f6: Deprecate `experimental_live_sse` and introduce proper `live_sse` flag for sending live updates as server sent events.
+
+### Patch Changes
+
+- 6a8502d: Handle slot invalidations in PG18 more gracefully.
+- 02363fe: Add `stack_id` as logger metadata to telemetry reporter.
+- 1585136: Validate connection options for lock breaker connection.
+- 7e58fb1: Trigger connection system restart on publication misconfiguration or missing to force fresh setup.
+- bec7bfd: Stop reporting disk usage in StackTelemetry, it's too expensive for a regular measurement.
+- 0296125: Retire ELECTRIC_EXPERIMENTAL_MAX_SHAPES environment variable
+- 816b8e9: Fix publication mishandling by only updating prepared relations in one place.
+- fa2660b: Reduce memory footprint of shape consumer processes by avoiding repeating the same path prefix multiple times and calculating shape-specific storage fields on the fly instead.
+- 14ce221: Handle requests during stack shutdown more gracefully
+- d539102: Add a new configuration option ELECTRIC_REPLICATION_IDLE_TIMEOUT that allows Electric to close database connections automatically when the replication stream is idle. This enables the database server to scale-to-zero on supported providers.
+- 6fa0258: Simplify connection status error handling for runtime failures
+- 2c84022: Remove unnecessary clearing of storage on initialization"
+- 8eb1071: Change expiry policy to expire the excess shapes (the number over MAX_SHAPES) every minute
+- a057f9c: Fix deadlock appearing during high concurrency publication updates.
+- 3ddf777: Post a scaled_down_database_connections stack event when the connection subsystem is stopped.
+- 519b936: Parse more DB errors as retryable (`ssl connect: closed` and `connection_refused` with PG code 08006).
+- 1c1f59c: Ensure publication update failures only affect relevant shapes
+- 562d290: Restore ShapeLogCollector's state from the ShapeStatus ETS table at startup
+- 852ec59: Restore shapes in `PublicationManager` via the `ShapeStatus` ETS to avoid message congestion.
+- a212279: Support generated column replication in Postgres 18 with new `publish_generated_columns = stored` setting on publication.
+- 8f38a11: Parse compute node unreachable database errors as retryable.
+- 9cf77e5: Properly handle reconnections during setup of connection manager
+- b5879ae: Expose more BEAM VM metrics in ApplicationTelemetry that can be exported via OTEL.
+- 4f7aef1: Ensure the lock breaker connection is not linked to the connection manager to avoid unnecessary crashes.
+- c3e2582: fix: ensure shapes with subqueries are deserialized correctly when loading from disk, and materializers are properly started
+- 8f38a11: Ensure pool shutdown does not log independent exit error
+
 ## 1.1.14
 
 ### Patch Changes
