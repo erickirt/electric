@@ -1,5 +1,11 @@
 # @core/sync-service
 
+## 1.2.10
+
+### Patch Changes
+
+- 3c88770: Remove persistence of metadata from `ShapeStatus` and instead rely on storage for reading and caching.
+
 ## 1.2.9
 
 ### Patch Changes
