@@ -1,5 +1,11 @@
 # @core/sync-service
 
+## 1.4.7
+
+### Patch Changes
+
+- 7c2d1fe: Fix an infinite recursive loop that API request processes may get stuck in when the consumer process is slow to start or dies unexpectedly, without cleaning up after itself.
+
 ## 1.4.6
 
 ### Patch Changes
