@@ -1,5 +1,12 @@
 # @core/electric-telemetry
 
+## 0.1.8
+
+### Patch Changes
+
+- b1138d9: Include snapshot metrics in exports
+- 69ba13c: Update all Elixir dependencies to latest versions
+
 ## 0.1.7
 
 ### Patch Changes
