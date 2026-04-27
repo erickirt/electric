@@ -1,5 +1,11 @@
 # @electric-ax/agents-server
 
+## 0.2.1
+
+### Patch Changes
+
+- 842182d: fix: ensure CORS is set to \*
+
 ## 0.2.0
 
 ### Minor Changes
