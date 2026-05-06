@@ -1,5 +1,16 @@
 # @electric-ax/agents
 
+## 0.2.5
+
+### Patch Changes
+
+- 65f0cf0: Add `openai-codex` as a built-in model provider. When the user has logged into OpenAI Codex CLI (`~/.codex/auth.json` exists), GPT-5.x models automatically appear in the dashboard model dropdown with reasoning effort support.
+- f509387: Allow Horton and Worker to use configured Anthropic or OpenAI models. Adds a `model-catalog` that selects providers from `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`, surfaces UI-selectable reasoning effort for compatible OpenAI reasoning models, and threads the catalog through `bootstrap`, `registerHorton`, `registerWorker`, and `spawnWorker`.
+- a3cee92: Remove the coder entity (coding-session). The `registerCodingSession`, `useCodingAgent`, `CodingSessionHandle`, and related types/tools (`spawn_coder`, `prompt_coder`) are no longer available. The `agent-session-protocol` dependency is also removed.
+- Updated dependencies [f509387]
+- Updated dependencies [a3cee92]
+  - @electric-ax/agents-runtime@0.1.3
+
 ## 0.2.4
 
 ### Patch Changes

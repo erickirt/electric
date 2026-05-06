@@ -1,5 +1,19 @@
 # electric-ax
 
+## 0.1.18
+
+### Patch Changes
+
+- b16ef14: fix: don't show a stale error before the first API key prompt when no key is configured
+- Updated dependencies [65f0cf0]
+- Updated dependencies [f509387]
+- Updated dependencies [f509387]
+- Updated dependencies [a3cee92]
+- Updated dependencies [92a332e]
+  - @electric-ax/agents@0.2.5
+  - @electric-ax/agents-runtime@0.1.3
+  - @electric-sql/client@1.5.17
+
 ## 0.1.17
 
 ### Patch Changes

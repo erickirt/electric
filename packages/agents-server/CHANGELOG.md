@@ -1,5 +1,16 @@
 # @electric-ax/agents-server
 
+## 0.2.9
+
+### Patch Changes
+
+- a3cee92: Remove the coder entity (coding-session). The `registerCodingSession`, `useCodingAgent`, `CodingSessionHandle`, and related types/tools (`spawn_coder`, `prompt_coder`) are no longer available. The `agent-session-protocol` dependency is also removed.
+- Updated dependencies [f509387]
+- Updated dependencies [a3cee92]
+- Updated dependencies [92a332e]
+  - @electric-ax/agents-runtime@0.1.3
+  - @electric-sql/client@1.5.17
+
 ## 0.2.8
 
 ## 0.2.7
