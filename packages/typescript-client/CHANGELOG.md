@@ -1,5 +1,12 @@
 # @electric-sql/client
 
+## 1.5.27
+
+### Patch Changes
+
+- d9d2666: Prevent subscription startup failures from also surfacing as unhandled promise
+  rejections after they are delivered to the subscriber error callback.
+
 ## 1.5.26
 
 ### Patch Changes

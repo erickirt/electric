@@ -1,5 +1,12 @@
 # @core/sync-service
 
+## 1.7.13
+
+### Patch Changes
+
+- f0e1904: Only advance the global last seen LSN on commit-bearing transaction fragments. Large transactions are split into multiple fragments that all carry the transaction's final LSN, so a `up-to-date` response could previously advertise an LSN whose changes were not yet readable in the shape logs, and a later response could then return data at that same LSN.
+- 138039d: Stop applying `ELECTRIC_TWEAKS_CONN_MAX_REQUESTS` to HTTP/2 connections. The limit is only meaningful for HTTP/1, where it recycles long-lived handler processes at a request boundary. Under HTTP/2 it made Bandit tear down the whole multiplexed connection with GOAWAY/REFUSED_STREAM once the cumulative stream count reached the limit (50 by default), disrupting in-flight streams and causing reconnect bursts.
+
 ## 1.7.12
 
 ### Patch Changes
